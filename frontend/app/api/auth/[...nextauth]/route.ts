@@ -15,31 +15,37 @@ const handler = NextAuth({
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        name: { label: "Name", type: "text" },
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        const res = await fetch(`${process.env.API_URL}/api/auth/login`, {
+        const res = await fetch(`${process.env.API_URL}/api/v1/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(credentials)
         })
+        const data = await res.json()
+        if (res.ok) {
+          return data;
+        }
 
-        const user = await res.json()
-        if (res.ok && user) return user
-        throw new Error(user.message || "Invalid credentials")
+        throw new Error(data.message || "Invalid credentials or server error");
       }
     })
   ],
 
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
+    maxAge: 7 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60, // 24 hours
+  },
+  jwt: {
+    maxAge: 7 * 24 * 60 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
-    // When Google user logs in
+
     async signIn({ user, account }) {
       console.log("➡️ signIn callback triggered:", account?.provider, user.email);
 
@@ -75,6 +81,11 @@ const handler = NextAuth({
       session.user = token.user as any
       return session
     }
+
+    
+  },
+  pages: {
+    signIn: "/login"
   }
 })
 

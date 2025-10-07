@@ -2,14 +2,19 @@
 
 import { Button } from "@/components/ui/button";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 
 export default function Home() {
   const {data: session} = useSession()
-
+  const router = useRouter()
   if(!session) {
-    return (
+    return (<>
       <Button onClick={() => signIn("google", { callbackUrl: "/" })}>SignIn using Google</Button>
+      <Button onClick={() => signIn()}>SignIn</Button>
+      <Button onClick={() => router.push("/register")}>SignUp</Button>
+    </>
+      
     )
   }
   return (

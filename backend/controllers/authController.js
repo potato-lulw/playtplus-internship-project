@@ -31,6 +31,8 @@ export const signupUser = async (req, res) => {
 };
 
 
+//TODO remove this controller 
+
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -43,8 +45,17 @@ export const loginUser = async (req, res) => {
 
     if (!user.comparePassword(password)) return res.status(400).json({ message: "Incorrect password" });
 
-    createJWT(res, user._id);
-    res.status(200).json({ message: "Login user" });
+    const userForNextAuth = {
+        id: user._id,  
+        email: user.email,
+        name: user.name,  
+         
+    };
+
+    createJWT(res, user._id); 
+
+    res.status(200).json(userForNextAuth); 
+
   } catch (error) {
     console.log("Error Logging in user: ", error.message || error);
     res.status(500).json({ message: "Server error", error: error.message || error });
@@ -75,7 +86,11 @@ export const oauthSync = async (req, res) => {
       user.avatar = avatar
       await user.save()
     }
-    res.json(user)
+
+    res.status(200).json({
+      message: "OAuth sync successful and JWT set",
+      user: { id: user._id, email: user.email, name: user.name, avatar: user.avatar },
+    });
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: "Failed to sync OAuth user" })
