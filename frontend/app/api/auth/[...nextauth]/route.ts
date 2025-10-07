@@ -25,6 +25,7 @@ const handler = NextAuth({
           body: JSON.stringify(credentials)
         })
         const data = await res.json()
+        console.log(data)
         if (res.ok) {
           return data;
         }
@@ -51,7 +52,7 @@ const handler = NextAuth({
 
       if (account?.provider === "google") {
         try {
-          const baseUrl = process.env.API_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+          const baseUrl = process.env.API_URL || process.env.NEXTAUTH_URL || "http://localhost:8800";
           const res = await fetch(`${baseUrl}/api/v1/auth/oauth-sync`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -73,16 +74,29 @@ const handler = NextAuth({
     },
 
 
-    async jwt({ token, user }) {
-      if (user) token.user = user as any
-      return token
+    async jwt({ token, user, account }) {
+      if (user) {
+        token.user = {
+          ...token.user,
+          _id: user._id || token.user?._id || "",           // fallback for _id
+          name: user.name || "Unknown",                     // fallback if null
+          email: user.email || "unknown@example.com",      // fallback if null
+          avatar: user.avatar || user.image || "",         // merge avatar / image
+          cover: user.cover || "",
+          followers: user.followers || [],
+          following: user.following || [],
+        };
+      }
+      return token;
     },
+
     async session({ session, token }) {
       session.user = token.user as any
       return session
     }
 
-    
+
+
   },
   pages: {
     signIn: "/login"

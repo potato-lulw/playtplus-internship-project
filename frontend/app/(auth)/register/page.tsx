@@ -45,8 +45,9 @@ export default function SignUpPage() {
     }
 
     return (
-        <div className='flex flex-col min-h-screen justify-center items-center' style={{ backgroundColor: '#f5f5f5' }}>
+        <div className='flex flex-col min-h-screen justify-center items-center w-full bg-gradient-to-br from-primary/50 to-secondary/20' >
             <form onSubmit={handleSubmit(onSubmit)} className="flex  justify-center bg-background flex-col gap-2 md:max-w-md w-full mx-auto  md:p-12 px-16  h-screen md:h-fit md:rounded-2xl md:shadow-[0_3px_10px_rgb(0,0,0,0.2)]">
+                <div className='md:hidden absolute top-0 left-0 right-0 bottom-0 h-[20%] flex bg-gradient-to-br from-primary/50 to-secondary/50'></div>
                 <div className='flex justify-center'>
                     {/* Logo */}
                     <Image src={'/logo.png'} alt="Logo" width={50} height={50} />
@@ -59,8 +60,9 @@ export default function SignUpPage() {
                 
                 <Input
                     id='username'
+                    type='text'
                     placeholder="Username"
-                    className='border-2 border-gradient-to-r from-primary to-secondary'
+                    className=' focus-visible:ring-1 focus-visible:ring-primary'
                     {...register('username', { required: 'Username is required' })}
                 />
                 {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
@@ -70,6 +72,7 @@ export default function SignUpPage() {
                     id="email"
                     type="email"
                     placeholder="Email"
+                    className='focus-visible:ring-1 focus-visible:ring-primary'
                     {...register('email', { required: 'Email is required' })}
                 />
                 {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
