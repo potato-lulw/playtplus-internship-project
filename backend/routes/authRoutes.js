@@ -1,5 +1,5 @@
 import express from "express";
-import { loginUser, logoutUser, signupUser } from "../controllers/authController.js";
+import { loginUser, logoutUser, signupUser, oauthSync} from "../controllers/authController.js";
 
 const router = express.Router();
 
@@ -7,6 +7,7 @@ const router = express.Router();
 router.post('/signup', signupUser);
 router.post('/login', loginUser);
 router.post('/logout', logoutUser);
+router.post('/oauth-sync', oauthSync);
 
 
 export default router;
