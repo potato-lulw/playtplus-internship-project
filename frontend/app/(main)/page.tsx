@@ -1,6 +1,6 @@
 "use client"
 
-import PostCard from "@/components/PostCard";
+import PostCard from "@/components/post/PostCard";
 import StoriesBar from "@/components/StoriesBar";
 import ThemeToggle from "@/components/ThemeToggle";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";

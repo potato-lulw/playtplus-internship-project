@@ -13,7 +13,7 @@ const PostImage = ({ src, alt }: PostImageProps) => {
         alt={alt}
         width={400}
         height={300}
-        className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
+        className="w-full max-h-[400px] h-auto object-cover hover:scale-105 transition-transform duration-300"
       />
     </div>
   );

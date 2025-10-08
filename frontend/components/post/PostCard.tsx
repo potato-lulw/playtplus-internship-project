@@ -4,6 +4,7 @@ import PostImage from "./PostImage";
 import PostActions from "./PostActions";
 
 interface PostCardProps {
+  postId: string;
   userId: string;
   userImage: string;
   userName: string;
@@ -14,12 +15,15 @@ interface PostCardProps {
   image?: string;
   imageAlt?: string;
   likeCount: number;
+  dislikeCount: number;
   commentCount: number;
   likedBy?: string[];
+  dislikedBy?: string[];
   likedByImages?: string[];
 }
 
 const PostCard = ({
+  postId,
   userId,
   userImage,
   userName,
@@ -30,12 +34,14 @@ const PostCard = ({
   image,
   imageAlt = "Post image",
   likeCount,
+  dislikeCount,
   commentCount,
   likedBy,
+  dislikedBy,
   likedByImages,
 }: PostCardProps) => {
   return (
-    <div className="w-full bg-card rounded-lg shadow-sm border border-border  max-w-2xl animate-fade-in">
+    <div className="w-full bg-card rounded-lg shadow-sm border border-border  max-w-4xl animate-fade-in">
       <PostHeader
         userId={userId}
         userImage={userImage}
@@ -50,9 +56,13 @@ const PostCard = ({
       {image && <PostImage src={image} alt={imageAlt} />}
       
       <PostActions
+        postId={postId}
+        userId={userId}
         likeCount={likeCount}
+        dislikeCount={dislikeCount}
         commentCount={commentCount}
         likedBy={likedBy}
+        dislikedBy={dislikedBy}
         likedByImages={likedByImages}
       />
     </div>

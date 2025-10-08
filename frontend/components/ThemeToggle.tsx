@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
-const ThemeToggle = () => {
+const ThemeToggle = ({className} : {className?: string}) => {
   const { theme, setTheme } = useTheme();
 
   // 👇 wait until mounted before reading theme
@@ -26,6 +26,7 @@ const ThemeToggle = () => {
       variant="outline"
       size="icon"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      className={`${className}`}
     >
       <Sun
         className={`${theme === 'dark'

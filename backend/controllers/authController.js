@@ -19,7 +19,7 @@ export const signupUser = async (req, res) => {
     const user = new User({ email, password, name });
     await user.save();
 
-    createJWT(res, user._id);
+    // createJWT(res, user._id);
     res.status(201).json({
       message: "Signup successful",
       user: { id: user._id, email: user.email, name: user.name },
@@ -46,15 +46,14 @@ export const loginUser = async (req, res) => {
     if (!user.comparePassword(password)) return res.status(400).json({ message: "Incorrect password" });
 
     const userForNextAuth = {
-        id: user._id,  
-        email: user.email,
-        name: user.name,  
-        avatar: user.avatar
+      _id: user._id,  
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
     };
 
-    createJWT(res, user._id); 
 
-    res.status(200).json(userForNextAuth); 
+    res.status(200).json(userForNextAuth);
 
   } catch (error) {
     console.log("Error Logging in user: ", error.message || error);

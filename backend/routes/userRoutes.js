@@ -1,12 +1,13 @@
 import express from "express";
-import { followUser, getUser, unfollowUser, updateUser } from "../controllers/userController.js";
+import { followUser, getFollowList, getUser, unfollowUser, updateUser } from "../controllers/userController.js";
 import { protectedRoute } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 router.use(protectedRoute)
 
-router.get("/me", getUser);
+router.get("/following", getFollowList);
+router.get("/:id", getUser);
 router.patch("/me", updateUser);
 router.post("/:id/follow", followUser);
 router.delete("/:id/follow", unfollowUser);

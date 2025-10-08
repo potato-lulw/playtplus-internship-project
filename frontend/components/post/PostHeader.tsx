@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Volume2 } from "lucide-react";
 import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 
 interface PostHeaderProps {
   userId: string;
@@ -33,7 +34,7 @@ const PostHeader = ({
         <div className="flex flex-col">
           <h3 className="font-semibold text-foreground">{userName}</h3>
           <p className="text-sm text-muted-foreground">
-            {userInfo} • {timestamp}
+            {userInfo} • {formatDistanceToNow(new Date(timestamp), { addSuffix: true })}
           </p>
         </div>
       </div>

@@ -78,10 +78,10 @@ const handler = NextAuth({
       if (user) {
         token.user = {
           ...token.user,
-          _id: user._id || token.user?._id || "",           // fallback for _id
-          name: user.name || "Unknown",                     // fallback if null
-          email: user.email || "unknown@example.com",      // fallback if null
-          avatar: user.avatar || user.image || "",         // merge avatar / image
+          _id: user._id || token.user?._id || "",           
+          name: user.name || "Unknown",                    
+          email: user.email || "unknown@example.com",      
+          avatar: user.avatar || user.image || "",         
           cover: user.cover || "",
           followers: user.followers || [],
           following: user.following || [],

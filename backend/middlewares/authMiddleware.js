@@ -1,25 +1,22 @@
-import jwt from 'jsonwebtoken';
+// import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
+
+import { getToken } from "next-auth/jwt";
 
 const protectedRoute = async (req, res, next) => {
   try {
-    // Use the NextAuth cookie name
-    const token = req.cookies["next-auth.session-token"] || req.cookies["__Secure-next-auth.session-token"];
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized - No token found" });
-    }
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-    // Verify token using the same secret as NextAuth
-    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
 
-    const user = await User.findById(decoded.user?.id || decoded.userID);
+    if (!token) return res.status(401).json({ message: "Unauthorized - No token" });
 
+    const user = await User.findById(token.user?._id || token.userID);
     if (!user) return res.status(401).json({ message: "Unauthorized - User not found" });
 
     req.user = {
       email: user.email,
       name: user.name,
-      userID: user._id,
+      _id: user._id,
     };
 
     next();

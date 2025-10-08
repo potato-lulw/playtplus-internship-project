@@ -1,16 +1,19 @@
 import express from "express";
-import { createPost, getPosts, likePost, createComment, replyComment, reportPost } from "../controllers/postController.js";
+import { createPost, getPosts, likePost, createComment, replyComment, reportPost, getPostsByUserId, dislikePost } from "../controllers/postController.js";
 import { protectedRoute } from "../middlewares/authMiddleware.js";
+import upload from "../config/multer.js";
 
 const router = express.Router();
 
 router.use(protectedRoute);
 
-router.post('/createpost', createPost);
-router.get('/posts', getPosts);
-router.post('/posts/:id/like', likePost);
-router.post('/posts/:id/report', reportPost);
-router.post('/posts/:id/comments', createComment);
+router.post('/createpost', upload.single("image"), createPost);
+router.get('/all', getPosts);
+router.get('/:id', getPostsByUserId);
+router.put('/like/:id', likePost);
+router.put('/dislike/:id', dislikePost);
+router.post('/:id/report', reportPost);
+router.post('/:id/comments', createComment);
 router.post('/comments/:id/replies', replyComment);
 
 export default router;
