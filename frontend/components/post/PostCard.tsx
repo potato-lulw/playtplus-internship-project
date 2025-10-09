@@ -17,9 +17,10 @@ interface PostCardProps {
   likeCount: number;
   dislikeCount: number;
   commentCount: number;
-  likedBy?: string[];
+  likedBy?: { name: string, _id: string }[];
   dislikedBy?: string[];
   likedByImages?: string[];
+ 
 }
 
 const PostCard = ({
@@ -39,6 +40,7 @@ const PostCard = ({
   likedBy,
   dislikedBy,
   likedByImages,
+  
 }: PostCardProps) => {
   return (
     <div className="w-full bg-card rounded-lg shadow-sm border border-border  max-w-4xl animate-fade-in">

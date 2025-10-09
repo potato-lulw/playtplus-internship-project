@@ -22,6 +22,7 @@ const PostHeader = ({
   timestamp,
   isPromoted = false,
 }: PostHeaderProps) => {
+  // console.log(userImage)
   return (
     <div className="flex items-center justify-between p-6">
       <div className="flex items-center gap-3">

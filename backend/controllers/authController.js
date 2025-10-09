@@ -43,13 +43,16 @@ export const loginUser = async (req, res) => {
 
     if (!user) return res.status(400).json({ message: "User does not exist" });
 
-    if (!user.comparePassword(password)) return res.status(400).json({ message: "Incorrect password" });
+    if (!(await user.comparePassword(password))) {
+      return res.status(400).json({ message: "Incorrect password" });
+    }
 
     const userForNextAuth = {
-      _id: user._id,  
+      _id: user._id,
       email: user.email,
       name: user.name,
       avatar: user.avatar,
+      cover: user.cover
     };
 
 
@@ -75,23 +78,35 @@ export const logoutUser = async (req, res) => {
 
 export const oauthSync = async (req, res) => {
   try {
-    const { email, name, avatar, password } = req.body
-    console.log(email, name, avatar)
-    let user = await User.findOne({ email })
+    const { email, name, avatar, password } = req.body;
+    console.log(email, name, avatar);
+
+    let user = await User.findOne({ email });
+
     if (!user) {
-      user = new User({ email, name, avatar, password })
-      await user.save()
-    } else if (avatar && user.avatar !== avatar) {
-      user.avatar = avatar
-      await user.save()
+      user = new User({ email, name, avatar, password, cover: "" });
+      await user.save();
     }
+
+
+    // else if (avatar && user.avatar !== avatar) {
+    //   user.avatar = avatar;
+    //   await user.save();
+    // }
 
     res.status(200).json({
       message: "OAuth sync successful and JWT set",
-      user: { id: user._id, email: user.email, name: user.name, avatar: user.avatar },
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar,
+        cover: user.cover || "",
+      },
     });
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ message: "Failed to sync OAuth user" })
+    console.error(err);
+    res.status(500).json({ message: "Failed to sync OAuth user" });
   }
-}
+};
+

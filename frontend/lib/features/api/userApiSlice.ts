@@ -12,11 +12,19 @@ export interface User {
   updatedAt: string;
 }
 
+
 export const userApiSlice = api.injectEndpoints({
   endpoints: (builder) => ({
     getUser: builder.query<{ message: string; user: User }, string>({
       query: (id) => ({
         url: `/users/${id}`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+    getAllusers: builder.query<{ message: string; users: User[] }, void>({
+      query: () => ({
+        url: `/users/all`,
         method: "GET",
         credentials: "include",
       }),
@@ -34,8 +42,17 @@ export const userApiSlice = api.injectEndpoints({
         method: "GET",
         credentials: "include",
       }),
+    }),
+    updateUser: builder.mutation<{ message: string; user: User }, FormData | { name: string, avatar: string, cover: string }>({
+      query: (formData) => ({
+        url: `/users/me`,
+        method: "PATCH",
+        credentials: "include",
+        body: formData
+      })
     })
   }),
+  // overrideExisting: true, 
 });
 
-export const { useGetUserQuery, useFollowUserMutation, useGetFollowingUsersQuery } = userApiSlice;
+export const { useGetUserQuery, useFollowUserMutation, useGetFollowingUsersQuery, useUpdateUserMutation, useGetAllusersQuery } = userApiSlice;

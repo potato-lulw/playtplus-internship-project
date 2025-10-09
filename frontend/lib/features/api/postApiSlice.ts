@@ -26,12 +26,12 @@ export interface PostData {
 }
 export interface LikeData {
     message: string,
-    post: {likes: string[], dislikes: string[]}
+    post: { likes: string[], dislikes: string[] }
 }
 
 const postApiSlice = api.injectEndpoints({
     endpoints: (builder) => ({
-        getAllPosts: builder.query<Post[], void>({
+        getAllPosts: builder.query<{ message: string; posts: Post[] }, void>({
             query: () => ({
                 url: `${postsUrl}/all`,
                 method: 'GET',
@@ -63,6 +63,7 @@ const postApiSlice = api.injectEndpoints({
         }),
 
     }),
+    // overrideExisting: true, // Explicitly allow overriding
 });
 
 export const { useGetAllPostsQuery, useGetPostsByUserIdQuery, useLikePostMutation, useDislikePostMutation } = postApiSlice;

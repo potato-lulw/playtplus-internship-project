@@ -10,6 +10,7 @@ import Image from 'next/image'
 import { FcGoogle } from 'react-icons/fc' // clean Google logo icon
 import { LogIn } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 type LoginFormValues = {
     email: string
@@ -38,12 +39,16 @@ export default function LoginPage() {
             })
 
             if (res?.error) {
+                toast.error('Login failed!')
                 console.error('Login failed:', res.error)
             } else {
+                toast.success('Login successful!')
                 console.log('Logged in successfully via NextAuth')
                 router.push('/')
             }
         } catch (error) {
+
+            toast.error('Error during login!')
             console.error('Error during login:', error)
         } finally {
             setIsLoading(false)

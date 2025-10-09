@@ -12,7 +12,7 @@ interface PostActionsProps {
     likeCount: number;
     commentCount: number;
     dislikeCount: number;
-    likedBy?: string[];
+    likedBy?: { name: string, _id: string }[];
     dislikedBy?: string[];
     likedByImages?: string[];
 }
@@ -30,37 +30,45 @@ const PostActions = ({
 
 
     const { data } = useSession();
-    const [isLiked, setIsLiked] = useState(likedBy.includes(data?.user.name!));
-    const [isDisliked, setIsDisliked] = useState(dislikedBy.includes(data?.user.name!));
+    const [isLiked, setIsLiked] = useState(
+        likedBy.some((l) => l._id === data?.user._id)
+    );
+
+    const [isDisliked, setIsDisliked] = useState(dislikedBy.includes(data?.user._id!));
     const [currentLikes, setCurrentLikes] = useState(likeCount);
     const [currentDislikes, setCurrentDislikes] = useState(dislikeCount);
 
     const [likePost] = useLikePostMutation();
     const [dislikePost] = useDislikePostMutation();
 
+
+
     const handleLike = async () => {
-        if (!userId) return;
+        if (!data?.user) return;
 
         try {
-            const res = await likePost({ postId, userId }).unwrap();
+            const res = await likePost({ postId, userId: data?.user._id }).unwrap();
             setCurrentLikes(res.post.likes.length);
             setCurrentDislikes(res.post.dislikes.length);
-            setIsLiked(!isLiked);
-            setIsDisliked(false);
+
+            // Update liked/disliked state based on server arrays
+            setIsLiked(res.post.likes.some(l => l === data?.user._id));
+            setIsDisliked(res.post.dislikes.some(d => d === data?.user._id));
         } catch (err) {
             console.error("Error liking post:", err);
         }
     };
 
     const handleDislike = async () => {
-        if (!userId) return;
+        if (!data?.user) return;
 
         try {
-            const res = await dislikePost({ postId, userId }).unwrap();
+            const res = await dislikePost({ postId, userId: data?.user._id}).unwrap();
             setCurrentLikes(res.post.likes.length);
             setCurrentDislikes(res.post.dislikes.length);
-            setIsLiked(false);
-            setIsDisliked(!isDisliked);
+
+            setIsLiked(res.post.likes.some(l => l === data?.user._id));
+            setIsDisliked(res.post.dislikes.some(d => d === data?.user._id));
         } catch (err) {
             console.error("Error disliking post:", err);
         }
@@ -104,12 +112,12 @@ const PostActions = ({
                         {likedByImages.slice(0, 3).map((img, idx) => (
                             <Avatar key={idx} className="w-6 h-6 border-2 border-card">
                                 <AvatarImage src={img} />
-                                <AvatarFallback>{likedBy[idx]?.slice(0, 1)}</AvatarFallback>
+                                <AvatarFallback>{likedBy[idx]?.name?.slice(0, 1)}</AvatarFallback>
                             </Avatar>
                         ))}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                        Liked by <span className="font-semibold text-foreground">{likedBy[0]}</span>
+                        Liked by <span className="font-semibold text-foreground">{likedBy[0]?.name}</span>
                         {likedBy.length > 1 && <span> and {likedBy.length - 1} others</span>}
                     </p>
                 </div>

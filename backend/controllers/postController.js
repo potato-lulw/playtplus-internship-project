@@ -11,8 +11,6 @@ import { Post } from "../models/post.js";
 export const createPost = async (req, res) => {
   try {
     const { text, author } = req.body;
-    
-    
 
     if (!text || !author) {
       return res.status(400).json({ message: "Missing text or author" });
@@ -28,10 +26,11 @@ export const createPost = async (req, res) => {
     });
 
     await post.save();
+    const savedPost = await Post.findById(post._id).populate("author", "name avatar email _id").populate("likes", "_id name avatar email").populate("dislikes", "_id name avatar email");
 
     res.status(201).json({
       message: "Post created successfully",
-      post,
+      post: savedPost,
     });
   } catch (error) {
 
@@ -43,9 +42,10 @@ export const createPost = async (req, res) => {
 
 export const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 }).populate("author", "name avatar email _id").populate("likes", "_id name avatar email").populate("dislikes", "_id");
+    const { _id } = req.user
+    const posts = await Post.find({author: { $ne: _id }}).sort({ createdAt: -1 }).populate("author", "name avatar email _id").populate("likes", "_id name avatar email").populate("dislikes", "_id");
     if (!posts) return res.status(404).json({ message: "No posts found" });
-  res.status(200).json({ message: "Get posts", posts });
+    res.status(200).json({ message: "Fetched all posts", posts });
   } catch (error) {
     console.log("Error getting posts: ", error.message || error);
     res.status(500).json({ message: "Server error", error: error.message || error });
@@ -54,11 +54,11 @@ export const getPosts = async (req, res) => {
 }
 export const getPostsByUserId = async (req, res) => {
   try {
-    const {id} = req.params
-    
-    const posts = await Post.find({author: id}).sort({ createdAt: -1 }).populate("author", "name avatar email _id").populate("likes", "_id name avatar email").populate("dislikes", "_id name");
+    const { id } = req.params
+
+    const posts = await Post.find({ author: id }).sort({ createdAt: -1 }).populate("author", "name avatar email _id").populate("likes", "_id name avatar email").populate("dislikes", "_id name");
     if (!posts) return res.status(404).json({ message: "No posts found" });
-  res.status(200).json({ message: "Get posts", posts });
+    res.status(200).json({ message: "Get posts", posts });
   } catch (error) {
     console.log("Error getting posts: ", error.message || error);
     res.status(500).json({ message: "Server error", error: error.message || error });
@@ -66,19 +66,19 @@ export const getPostsByUserId = async (req, res) => {
 }
 
 export const likePost = async (req, res) => {
-  try{
+  try {
     const { id } = req.params;
-    
+
     const { likerId } = req.body;
     const post = await Post.findById(id).populate("likes", "_id");
     if (!post) return res.status(404).json({ message: "Post not found" });
-    if(post.likes.includes(likerId)) {
+    if (post.likes.includes(likerId)) {
       post.likes.pull(likerId);
       await post.save();
       res.status(200).json({ message: "Post unliked", post });
     }
     else {
-      if(post.dislikes.includes(likerId)) {
+      if (post.dislikes.includes(likerId)) {
         post.dislikes.pull(likerId);
       }
       post.likes.push(likerId);
@@ -93,16 +93,16 @@ export const likePost = async (req, res) => {
 }
 export const dislikePost = async (req, res) => {
   try {
-    const {id} = req.params;
-    const {likerId} = req.body;
+    const { id } = req.params;
+    const { likerId } = req.body;
     const post = await Post.findById(id).populate("dislikes", "_id");
     if (!post) return res.status(404).json({ message: "Post not found" });
-    if(post.dislikes.includes(likerId)) {
+    if (post.dislikes.includes(likerId)) {
       post.dislikes.pull(likerId);
       await post.save();
       res.status(200).json({ message: "Post undisliked", post });
     } else {
-      if(post.likes.includes(likerId)) {
+      if (post.likes.includes(likerId)) {
         post.likes.pull(likerId);
       }
       post.dislikes.push(likerId);
@@ -111,9 +111,12 @@ export const dislikePost = async (req, res) => {
     }
   } catch (error) {
     console.log("Error disliking post: ", error.message || error);
-    res.status(500).json({ message: "Server error", error: error.message || error });   
+    res.status(500).json({ message: "Server error", error: error.message || error });
   }
 }
+
+
+
 
 
 

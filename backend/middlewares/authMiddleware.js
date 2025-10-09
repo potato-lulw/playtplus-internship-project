@@ -1,4 +1,5 @@
 // import jwt from 'jsonwebtoken';
+import { useReducer } from 'react';
 import User from '../models/user.js';
 
 import { getToken } from "next-auth/jwt";
@@ -17,6 +18,8 @@ const protectedRoute = async (req, res, next) => {
       email: user.email,
       name: user.name,
       _id: user._id,
+      avatar: user.avatar,
+      cover: user.cover,
     };
 
     next();

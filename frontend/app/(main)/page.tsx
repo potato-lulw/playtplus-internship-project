@@ -1,102 +1,69 @@
 "use client"
 
 import PostCard from "@/components/post/PostCard";
+import { Post } from "@/components/profile/PostsSection";
 import StoriesBar from "@/components/StoriesBar";
 import ThemeToggle from "@/components/ThemeToggle";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import { Button } from "@/components/ui/button";
+import { useGetAllPostsQuery } from "@/lib/features/api/postApiSlice";
+import { useGetAllusersQuery } from "@/lib/features/api/userApiSlice";
+import { User } from "@/types/User";
 import { Zap } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { redirect, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 
+
+
+interface Story {
+  id: string;
+  image: string;
+  label: string;
+  hasStory: boolean;
+  isYourStory?: boolean;
+}
+
+
+const convertUserToStory = (user: User, isYourStory = false): Story => {
+  return {
+    id: user._id,
+    image: user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}`,
+    label: user.name,
+    hasStory: true,
+    isYourStory
+  };
+};
 export default function Home() {
   const { data: session } = useSession()
   const router = useRouter()
+  const [stories, setStories] = useState<Story[]>();
 
-  const stories = [
-    {
-      id: "1",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=yours",
-      label: "Your Story",
-      hasStory: true,
-      isYourStory: true,
-    },
-    {
-      id: "2",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=lethal",
-      label: "Lethal Esporortsasda",
-      hasStory: true,
-    },
-    {
-      id: "3",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=olive1",
-      label: "Olivelgnite",
-      hasStory: true,
-    },
-    {
-      id: "4",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=olive2",
-      label: "Olivelgnite",
-      hasStory: true,
-    },
-    {
-      id: "5",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=lethal2",
-      label: "Lethal Esports",
-      hasStory: true,
-    },
-    {
-      id: "6",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=lethal3",
-      label: "Lethal Espor...",
-      hasStory: true,
-    },
-    {
-      id: "7",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=olive3",
-      label: "Olivelgnite",
-      hasStory: true,
-    },
-    {
-      id: "8",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=govi",
-      label: "Govicode",
-      hasStory: true,
-    },
-    {
-      id: "9",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=govi",
-      label: "Govicode",
-      hasStory: true,
-    },
-    {
-      id: "10",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=govi",
-      label: "Govicode",
-      hasStory: true,
-    },
-    {
-      id: "11",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=govi",
-      label: "Govicode",
-      hasStory: true,
-    },
-  ];
+  const { data, isLoading, error } = useGetAllPostsQuery();
+  const { data: userData, isLoading: isUserDataLoading, error: userDataError } = useGetAllusersQuery();
+
+
+  useEffect(() => {
+    if (userData) {
+      const stories = userData.users.map((user: User) => convertUserToStory(user));
+      setStories(stories);
+    }
+  }, [userData])
+
+  
   if (!session) {
-    return (<>
+    return (
       <section className="relative w-full flex-1 bg-background flex flex-col items-center justify-center">
         <BackgroundRippleEffect />
-        {/* Background gradient subtle overlay */}
-        <div className="absolute inset-0  bg-gradient-to-r from-primary/5 to-secondary/5"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5"></div>
 
         <div className="max-w-7xl mx-auto px-6 text-center flex flex-col items-center justify-center gap-6 z-20">
-
           <div className="flex gap-2 justify-center items-center px-2 py-1 bg-muted/40 text-sm text-gray-500 border border-border rounded-full">
-            <Zap className="text-foreground" size={16} color="#6a7282" /> Future of Gaming is here!
+            <Zap className="text-foreground" size={16} /> Future of Gaming is here!
           </div>
-          {/* Logo */}
+
           <div className="flex items-center justify-center gap-3">
             <Image src="/logo.png" alt="PlaytPlus Logo" width={60} height={60} />
             <h1 className="text-4xl sm:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
@@ -104,55 +71,61 @@ export default function Home() {
             </h1>
           </div>
 
-          {/* Tagline */}
           <p className="text-lg sm:text-xl text-muted-foreground max-w-xl">
             The social media platform for esports organizers. Easily create scrims, host official matches, and grow your competitive community.
           </p>
 
-          {/* Call to Action */}
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
-            <Button size="lg" className="bg-primary text-white hover:bg-primary/90" onClick={() => router.push('/register')}>
+            <Button size="lg" className="bg-primary text-white hover:bg-primary/90" onClick={() => router.push("/register")}>
               Get Started
             </Button>
             <Button size="lg" variant="outline" className="border-secondary text-secondary hover:bg-secondary/10">
               Learn More
             </Button>
           </div>
-
-
         </div>
 
-        {/* Optional: subtle bottom gradient */}
         <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-background/90 to-transparent -z-10"></div>
       </section>
-    </>
-
-    )
+    );
   }
+
+  if (isLoading) return <div className="text-center py-6">Loading posts...</div>;
+  if (error) return <div className="text-center py-6">Error fetching posts</div>;
+  if (!data?.posts || data.posts.length === 0)
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 py-12 text-center">
+        <img src="/broken-controller.png" alt="No posts" className="w-40 mb-6 opacity-80" />
+        <h2 className="text-xl font-bold text-foreground mb-2">No posts yet</h2>
+        <p className="text-muted-foreground max-w-sm">When they share something, it’ll appear here.</p>
+      </div>
+    );
+
   return (
     <div className="font-sans flex flex-col bg-gradient-to-br from-primary/5 to-secondary/5 w-full items-center flex-1 p-4 pb-20 gap-4 sm:p-8">
-      <StoriesBar stories={stories} />
-      <PostCard
-        userId="1"
-        userImage="https://api.dicebear.com/7.x/avataaars/svg?seed=sarah"
-        userName="Sarah Benette"
-        userInfo="2.2k Members"
-        timestamp="4d ago"
-        isPromoted={true}
-        content="Hey Guys!
-Been a while. Let's play a tournament!"
-        image="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop"
-        imageAlt="Gaming tournament landscape"
-        likeCount={214}
-        commentCount={38}
-        likedBy={["Jamie", "Alex", "Sam"]}
-        likedByImages={[
-          "https://api.dicebear.com/7.x/avataaars/svg?seed=jamie",
-          "https://api.dicebear.com/7.x/avataaars/svg?seed=alex",
-          "https://api.dicebear.com/7.x/avataaars/svg?seed=sam",
-        ]}
-      />
+      {stories && <StoriesBar stories={stories} />}
 
-    </div >
+      {data.posts.map((post: Post) => (
+        <PostCard
+          key={post._id}
+          postId={post._id}
+          userId={post.author._id}
+          userImage={post.author.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.author.name}`}
+          userName={post.author.name}
+          userInfo={"placeholder"}
+          timestamp={post.createdAt}
+          isPromoted={true}
+          content={post.text}
+          image={post.image}
+          imageAlt={`${post.author.name}'s post`}
+          likeCount={post.likes.length}
+          dislikeCount={post.dislikes.length}
+          commentCount={0}
+          likedBy={post.likes.map((l) => ({ _id: l._id, name: l.name }))}
+          dislikedBy={post.dislikes.map((l) => l._id)}
+          likedByImages={post.likes.slice(0, 3).map((l) => l.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${l.name}`)}
+        />
+      ))}
+    </div>
   );
 }

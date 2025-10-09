@@ -11,6 +11,7 @@ const authApiSlice = api.injectEndpoints({
             })
         })
     }),
+    // overrideExisting: true
 })
 
 export const { useSignUpMutation } = authApiSlice

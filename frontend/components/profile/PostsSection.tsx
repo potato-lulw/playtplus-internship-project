@@ -1,14 +1,14 @@
 "use client";
 import PostCard from "@/components/post/PostCard";
 
-interface Author {
+export interface Author {
   _id: string;
   name: string;
   email: string;
   avatar?: string;
 }
 
-interface Post {
+export interface Post {
   _id: string;
   text: string;
   image?: string;
@@ -21,6 +21,7 @@ interface Post {
 interface PostsSectionProps {
   posts: Post[] | undefined;
   isLoading: boolean;
+  
 }
 
 const PostsSection = ({ posts, isLoading }: PostsSectionProps) => {
@@ -75,6 +76,7 @@ const PostsSection = ({ posts, isLoading }: PostsSectionProps) => {
                 `https://api.dicebear.com/7.x/avataaars/svg?seed=${l.name}`
             ) || []
           }
+          
         />
       ))}
     </div>

@@ -57,7 +57,7 @@ const StoriesBar = ({ stories }: StoriesBarProps) => {
   }, []);
 
   return (
-    <div className="relative w-full max-w-2xl ">
+    <div className="relative w-full max-w-4xl ">
       {/* Left Arrow */}
       {canScrollLeft && (
         <Button

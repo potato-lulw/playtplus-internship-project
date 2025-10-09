@@ -52,7 +52,6 @@ const handler = NextAuth({
 
       if (account?.provider === "google") {
         try {
-          const baseUrl = process.env.API_URL || process.env.NEXTAUTH_URL || "http://localhost:8800";
           const res = await fetch(`${baseUrl}/api/v1/auth/oauth-sync`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -60,11 +59,19 @@ const handler = NextAuth({
               name: user.name,
               email: user.email,
               avatar: user.image,
-              password: process.env.GOOGLE_PASSWORD
+              password: process.env.GOOGLE_PASSWORD,
             }),
           });
 
-          console.log("Sync response:", res.status);
+          const data = await res.json();
+
+          if (res.ok && data?.user) {
+            user._id = data.user.id;
+            user.avatar = data.user.avatar;
+            user.cover = data.user.cover || "";
+          } else {
+            console.error("OAuth sync failed:", data?.message);
+          }
         } catch (err) {
           console.error("❌ OAuth sync failed:", err);
         }
@@ -74,26 +81,50 @@ const handler = NextAuth({
     },
 
 
-    async jwt({ token, user, account }) {
+
+    async jwt({ token, user, trigger, session }) {
+      // When user first logs in or signs up
       if (user) {
         token.user = {
-          ...token.user,
-          _id: user._id || token.user?._id || "",           
-          name: user.name || "Unknown",                    
-          email: user.email || "unknown@example.com",      
-          avatar: user.avatar || user.image || "",         
+          _id: user._id || "",
+          name: user.name || "Unknown",
+          email: user.email || "unknown@example.com",
+          avatar: user.avatar || user.image || "",
           cover: user.cover || "",
           followers: user.followers || [],
           following: user.following || [],
         };
       }
+
+      // When client calls update()
+      if (trigger === "update" && session?.user) {
+        token.user = {
+          ...token.user,
+          name: session.user.name,
+          avatar: session.user.avatar,
+          cover: session.user.cover,
+        };
+      }
+
       return token;
     },
 
     async session({ session, token }) {
-      session.user = token.user as any
-      return session
-    }
+      // Make sure token.user exists
+      if (token.user) {
+        session.user = token.user as {
+          _id: string;
+          name: string;
+          email: string;
+          avatar: string;
+          cover: string;
+          followers: any[];
+          following: any[];
+        };
+      }
+
+      return session;
+    },
 
 
 

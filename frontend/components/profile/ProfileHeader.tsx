@@ -5,8 +5,9 @@ import CreatePostDialog from "./CreatePostDialog";
 import ThemeToggle from "../ThemeToggle";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Post } from "@/lib/features/api/postApiSlice";
 
-const ProfileHeader = ({cover, isOther = false}: {cover: string, isOther?: boolean}) => {
+const ProfileHeader = ({ cover, isOther = false, onPostCreated, }: { cover: string, isOther?: boolean, onPostCreated?: (newPost: Post) => void }) => {
 
   const router = useRouter();
   return (
@@ -15,7 +16,7 @@ const ProfileHeader = ({cover, isOther = false}: {cover: string, isOther?: boole
         <ArrowLeft color="#fff" size={22} />
       </div>
       <Image
-        src={ cover || "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?q=80&w=1332&auto=format&fit=crop"}
+        src={cover || "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?q=80&w=1332&auto=format&fit=crop"}
         alt="cover-image"
         fill
         priority
@@ -23,7 +24,7 @@ const ProfileHeader = ({cover, isOther = false}: {cover: string, isOther?: boole
       />
       <div className="absolute top-4 right-4 flex gap-2 items-center ">
         <ThemeToggle className="rounded-full bg-transparent text-white hover:bg-transparent hover:text-white border-none" />
-        {!isOther && <CreatePostDialog />}
+        {!isOther && <CreatePostDialog onPostCreated={onPostCreated} />}
         <EllipsisVertical size={22} color="#fff" />
       </div>
     </div>

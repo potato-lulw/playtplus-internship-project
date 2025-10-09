@@ -39,7 +39,7 @@ const Navbar = () => {
 
     return (
         <nav className="w-full sticky top-0 bg-background border-b border-border z-50">
-            <div className="max-w-4xl mx-auto flex items-center justify-between px-4 py-3 md:px-6">
+            <div className="max-w-4xl mx-auto flex items-center justify-between py-3 px-6 md:px-3">
                 <div >
                     {/* Left: Logo */}
                     <Link href={'/'} className="flex items-center gap-2">
@@ -93,7 +93,7 @@ const Navbar = () => {
 
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem  className='p-1 hover:bg-none'>
-                                        <Button className='w-full bg-secondary hover:bg-secondary/90' onClick={() => signOut()}>Logout</Button>
+                                        <Button className='w-full bg-secondary hover:bg-secondary/90 text-white' onClick={() => signOut()}>Logout</Button>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
