@@ -29,7 +29,5 @@ app.use('/api/v1/auth', authRoutes);
 app.get('/health', (req, res) => {
     res.status(200).send('OK');
 })
-app.listen(process.env.PORT, () => {
-    console.log(`Server running on port ${process.env.PORT}`);
-    
-});
+const PORT = process.env.PORT || 8800;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
