@@ -48,14 +48,14 @@ const postApiSlice = api.injectEndpoints({
             query: () => ({
                 url: `${postsUrl}/all`,
                 method: 'GET',
-                credentials: 'include',
+                
             }),
         }),
         getPostsByUserId: builder.query<PostData, { id: string }>({
             query: ({ id }) => ({
                 url: `${postsUrl}/${id}`,
                 method: "GET",
-                credentials: "include",
+                
             }),
         }),
         likePost: builder.mutation<LikeData, { postId: string; userId: string }>({
@@ -63,7 +63,7 @@ const postApiSlice = api.injectEndpoints({
                 url: `${postsUrl}/like/${postId}`,
                 method: "PUT",
                 body: { likerId: userId },
-                credentials: "include",
+                
             }),
         }),
         dislikePost: builder.mutation<LikeData, { postId: string; userId: string }>({
@@ -71,7 +71,7 @@ const postApiSlice = api.injectEndpoints({
                 url: `${postsUrl}/dislike/${postId}`,
                 method: "PUT",
                 body: { likerId: userId },
-                credentials: "include",
+                
             }),
         }),
         reportPost: builder.mutation({
@@ -79,7 +79,7 @@ const postApiSlice = api.injectEndpoints({
                 url: `/posts/${id}/report`,
                 method: "POST",
                 body: { reason },
-                credentials: "include",
+                
             }),
         }),
         createComment: builder.mutation<{message: string, comment: Comment}, { postId: string; text: string; parentId?: string }>({
@@ -87,7 +87,7 @@ const postApiSlice = api.injectEndpoints({
                 url: `/posts/${postId}/comments`,
                 method: "POST",
                 body: { text, parentId },
-                credentials: "include",
+               
             }),
 
         }),

@@ -19,35 +19,35 @@ export const userApiSlice = api.injectEndpoints({
       query: (id) => ({
         url: `/users/${id}`,
         method: "GET",
-        credentials: "include",
+
       }),
     }),
     getAllusers: builder.query<{ message: string; users: User[] }, void>({
       query: () => ({
         url: `/users/all`,
         method: "GET",
-        credentials: "include",
+
       }),
     }),
     followUser: builder.mutation<{ message: string; following: boolean }, string>({
       query: (id) => ({
         url: `/users/${id}/follow`,
         method: "POST",
-        credentials: "include",
+
       }),
     }),
     getFollowingUsers: builder.query<{ message: string; following: string[] }, void>({
       query: () => ({
         url: `/users/following`,
         method: "GET",
-        credentials: "include",
+
       }),
     }),
     updateUser: builder.mutation<{ message: string; user: User }, FormData | { name: string, avatar: string, cover: string }>({
       query: (formData) => ({
         url: `/users/me`,
         method: "PATCH",
-        credentials: "include",
+
         body: formData
       })
     }),
@@ -56,7 +56,7 @@ export const userApiSlice = api.injectEndpoints({
         url: `/users/${id}/report`,
         method: "POST",
         body: { reason },
-        credentials: "include",
+
       }),
     }),
   }),
