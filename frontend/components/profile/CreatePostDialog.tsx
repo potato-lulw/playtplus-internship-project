@@ -28,7 +28,8 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     body.append("author", data?.user?._id || "");
 
     try {
-      const res = await fetch("http://localhost:8800/api/v1/posts/createpost", {
+      const url = process.env.API_URL || "http://localhost:8800";
+      const res = await fetch(`${url}/api/v1/posts/createpost`, {
         method: "POST",
         body,
         credentials: "include",
