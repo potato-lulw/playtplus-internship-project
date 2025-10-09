@@ -59,6 +59,17 @@ const handler = NextAuth({
 
   // Secret is required for signing and encrypting tokens
   secret: process.env.NEXTAUTH_SECRET,
+  cookies: {
+    sessionToken: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'none',
+        path: '/',
+        secure: true, // ⭐ Required when sameSite: 'none'
+      },
+    }
+  },
 
   callbacks: {
 
@@ -157,17 +168,7 @@ const handler = NextAuth({
     signIn: "/login"
   },
 
-  cookies: {
-    sessionToken: {
-      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'none', // ⭐ Critical for cross-origin
-        path: '/',
-        secure: true, // ⭐ Required when sameSite: 'none'
-      },
-    }
-  }
+
 })
 
 // Export the handler for Next.js API routes
