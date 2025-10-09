@@ -27,6 +27,7 @@ const protectedRoute = async (req, res, next) => {
   //   console.error("Middleware error:", err);
   //   res.status(401).json({ message: "Unauthorized - Invalid token" });
   // }
+  next();
 };
 
 
