@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+const NEXTAUTH_URL = process.env.NEXTAUTH_URL;
 
 
 const handler = NextAuth({
