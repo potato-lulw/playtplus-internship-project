@@ -4,18 +4,18 @@ import ProfilePicture from "@/components/profile/ProfilePicture";
 import ProfileInfo from "@/components/profile/ProfileInfo";
 import Followers from "@/components/profile/Followers";
 import PostsSection from "@/components/profile/PostsSection";
-import { PostData, useGetAllPostsQuery, useGetPostsByUserIdQuery } from "@/lib/features/api/postApiSlice";
+import { Comment, PostData, useGetAllPostsQuery, useGetPostsByUserIdQuery } from "@/lib/features/api/postApiSlice";
 import { useSession } from "next-auth/react";
 import PostCardSkeleton from "@/components/post/PostCarSkeleton";
 import { useGetFollowingUsersQuery, useGetUserQuery } from "@/lib/features/api/userApiSlice";
 import { useEffect, useState } from "react";
-import { set } from "date-fns";
 
 const MyProfilePage = () => {
 
   const { data: session, status } = useSession();
   const [postData, setPostData] = useState<PostData>({ message: "", posts: [] });
-
+  console.log(postData)
+  const [comments, setComments] = useState<{ [postId: string]: Comment[] }>({});
   const userId = Array.isArray(session?.user._id) ? session.user._id[0] : session?.user._id;
   const { data: userData, isLoading: userDataIsLoading, error: userDataError } = useGetUserQuery(userId);
   const { data: postsData, error, isLoading } = useGetPostsByUserIdQuery(
@@ -23,12 +23,28 @@ const MyProfilePage = () => {
     { skip: !session?.user?._id } // <-- skip until we have the user ID
   );
 
-
-
   useEffect(() => {
+    if (!postsData?.posts) return;
 
-    setPostData({ message: "", posts: postsData?.posts || [] });
-    console.log(postData)
+    // Build comments object keyed by postId
+    const commentsMap: { [postId: string]: Comment[] } = {};
+
+    postsData.posts.forEach(post => {
+      commentsMap[post._id] = post.comments?.map((c: any) => ({
+        _id: c._id,
+        text: c.text,
+        author: c.author,
+        name: c.name,
+        postId: c.postId,
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt
+      })) || [];
+    });
+
+    setComments(commentsMap);
+
+    // Update posts without comments (optional)
+    setPostData({ message: "", posts: postsData.posts });
 
   }, [postsData]);
 
@@ -57,7 +73,7 @@ const MyProfilePage = () => {
         <Followers followers={userData?.user.followers?.length || 0} following={userData?.user.following?.length || 0} />
         {isLoading || status === "loading"
           ? [...Array(5)].map((_, index) => <PostCardSkeleton key={index} />)
-          : <PostsSection posts={postData.posts} isLoading={isLoading} />
+          : <PostsSection posts={postData.posts} isLoading={isLoading} comments={comments} setComments={setComments} />
         }
 
 

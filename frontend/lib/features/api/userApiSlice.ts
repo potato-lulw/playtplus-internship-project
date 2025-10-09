@@ -50,9 +50,17 @@ export const userApiSlice = api.injectEndpoints({
         credentials: "include",
         body: formData
       })
-    })
+    }),
+    reportUser: builder.mutation({
+      query: ({ id, reason }) => ({
+        url: `/users/${id}/report`,
+        method: "POST",
+        body: { reason },
+        credentials: "include",
+      }),
+    }),
   }),
   // overrideExisting: true, 
 });
 
-export const { useGetUserQuery, useFollowUserMutation, useGetFollowingUsersQuery, useUpdateUserMutation, useGetAllusersQuery } = userApiSlice;
+export const { useGetUserQuery, useFollowUserMutation, useGetFollowingUsersQuery, useUpdateUserMutation, useGetAllusersQuery, useReportUserMutation } = userApiSlice;

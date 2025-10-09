@@ -1,5 +1,7 @@
 "use client";
 import PostCard from "@/components/post/PostCard";
+import { Comment } from "@/lib/features/api/postApiSlice";
+import { useState } from "react";
 
 export interface Author {
   _id: string;
@@ -21,11 +23,13 @@ export interface Post {
 interface PostsSectionProps {
   posts: Post[] | undefined;
   isLoading: boolean;
-  
+  comments: { [postId: string]: Comment[] }
+  setComments: React.Dispatch<React.SetStateAction<{ [postId: string]: Comment[] }>>
 }
 
-const PostsSection = ({ posts, isLoading }: PostsSectionProps) => {
+const PostsSection = ({ posts, isLoading, comments, setComments }: PostsSectionProps) => {
   if (isLoading) return <div className="text-center py-6">Loading posts...</div>;
+  
 
   if (!posts || posts.length === 0)
     return (
@@ -37,7 +41,7 @@ const PostsSection = ({ posts, isLoading }: PostsSectionProps) => {
         />
         <h2 className="text-xl font-bold text-foreground mb-2">No posts yet</h2>
         <p className="text-muted-foreground max-w-sm">
-          When they share something, it’ll appear here. 
+          When they share something, it’ll appear here.
         </p>
       </div>
     )
@@ -67,7 +71,7 @@ const PostsSection = ({ posts, isLoading }: PostsSectionProps) => {
           likeCount={post.likes?.length || 0}
           dislikeCount={post.dislikes?.length || 0}
           commentCount={0}
-          likedBy={post.likes?.map((l: any) => l.name) || []}
+          likedBy={post.likes.map((l) => ({ _id: l._id, name: l.name }))}
           dislikedBy={post.dislikes?.map((l: any) => l.name) || []}
           likedByImages={
             post.likes?.slice(0, 3).map(
@@ -76,7 +80,9 @@ const PostsSection = ({ posts, isLoading }: PostsSectionProps) => {
                 `https://api.dicebear.com/7.x/avataaars/svg?seed=${l.name}`
             ) || []
           }
-          
+          comments={comments[post._id] || []} 
+          setComments={setComments} 
+
         />
       ))}
     </div>

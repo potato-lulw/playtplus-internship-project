@@ -8,13 +8,17 @@ const router = express.Router();
 router.use(protectedRoute);
 
 router.post('/createpost', upload.single("image"), createPost);
-router.get('/all', getPosts);
-router.get('/:id', getPostsByUserId);
-router.put('/like/:id', likePost);
-router.put('/dislike/:id', dislikePost);
 router.post('/:id/report', reportPost);
 router.post('/:id/comments', createComment);
 router.post('/comments/:id/replies', replyComment);
+
+// GET routes
+router.get('/all', getPosts);
+router.get('/:id', getPostsByUserId);
+
+// PUT routes
+router.put('/like/:id', likePost);
+router.put('/dislike/:id', dislikePost);
 
 export default router;
 

@@ -4,6 +4,7 @@
 // Users DELETE /api/v1/users/:id/follow unfollow user
 
 import User from "../models/user.js";
+import { Report } from "../models/report.js";
 
 export const getUser = async (req, res) => {
   try {
@@ -129,5 +130,42 @@ export const getFollowList = async (req, res) => {
 };
 
 
+
+
+// Report a user
+export const reportUser = async (req, res) => {
+  try {
+    const reporterId = req.user._id;
+    const { id } = req.params; // reported user id
+    const { reason } = req.body;
+
+    if (!reason) {
+      return res.status(400).json({ message: "Reason is required" });
+    }
+
+    // check if reported user exists
+    const targetUser = await User.findById(id);
+    if (!targetUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const report = new Report({
+      targetType: "user",
+      targetId: id,
+      reason,
+      reporter: reporterId,
+    });
+
+    await report.save();
+
+    res.status(201).json({
+      message: "User reported successfully",
+      report,
+    });
+  } catch (error) {
+    console.error("Error reporting user:", error.message || error);
+    res.status(500).json({ message: "Server error", error: error.message || error });
+  }
+};
 
 

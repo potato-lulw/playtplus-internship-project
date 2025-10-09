@@ -2,6 +2,7 @@ import PostHeader from "./PostHeader";
 import PostContent from "./PostContent";
 import PostImage from "./PostImage";
 import PostActions from "./PostActions";
+import { Comment  } from "@/lib/features/api/postApiSlice";
 
 interface PostCardProps {
   postId: string;
@@ -20,7 +21,8 @@ interface PostCardProps {
   likedBy?: { name: string, _id: string }[];
   dislikedBy?: string[];
   likedByImages?: string[];
- 
+  comments: Comment[],
+  setComments: React.Dispatch<React.SetStateAction<{ [postId: string]: Comment[] }>>;
 }
 
 const PostCard = ({
@@ -40,11 +42,14 @@ const PostCard = ({
   likedBy,
   dislikedBy,
   likedByImages,
-  
+  comments,
+  setComments
+
 }: PostCardProps) => {
   return (
     <div className="w-full bg-card rounded-lg shadow-sm border border-border  max-w-4xl animate-fade-in">
       <PostHeader
+        postId={postId}
         userId={userId}
         userImage={userImage}
         userName={userName}
@@ -52,11 +57,11 @@ const PostCard = ({
         timestamp={timestamp}
         isPromoted={isPromoted}
       />
-      
+
       <PostContent text={content} />
-      
+
       {image && <PostImage src={image} alt={imageAlt} />}
-      
+
       <PostActions
         postId={postId}
         userId={userId}
@@ -66,6 +71,8 @@ const PostCard = ({
         likedBy={likedBy}
         dislikedBy={dislikedBy}
         likedByImages={likedByImages}
+        comments={comments}// <-- Pass the array of strings directly
+        setComments={setComments}
       />
     </div>
   );

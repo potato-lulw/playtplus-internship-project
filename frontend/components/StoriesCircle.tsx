@@ -15,7 +15,7 @@ const StoryCircle = ({ image, label, hasStory = true, isYourStory = false }: Sto
       <div
         className={cn(
           "relative rounded-md p-[2px] transition-transform group-hover:scale-105",
-          hasStory && "bg-gradient-to-tr from-primary via-secondary to-primary"
+          hasStory && "bg-gradient-to-tr from-primary/70 via-secondary/10 to-primary/50"
         )}
       >
         <Avatar className="w-16 h-16 border-4 border-card rounded-md">

@@ -6,7 +6,7 @@ import StoriesBar from "@/components/StoriesBar";
 import ThemeToggle from "@/components/ThemeToggle";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import { Button } from "@/components/ui/button";
-import { useGetAllPostsQuery } from "@/lib/features/api/postApiSlice";
+import { Comment, useGetAllPostsQuery } from "@/lib/features/api/postApiSlice";
 import { useGetAllusersQuery } from "@/lib/features/api/userApiSlice";
 import { User } from "@/types/User";
 import { Zap } from "lucide-react";
@@ -41,18 +41,38 @@ export default function Home() {
   const router = useRouter()
   const [stories, setStories] = useState<Story[]>();
 
-  const { data, isLoading, error } = useGetAllPostsQuery();
+  const { data: postsData, isLoading, error } = useGetAllPostsQuery();
+  console.log(postsData)
   const { data: userData, isLoading: isUserDataLoading, error: userDataError } = useGetAllusersQuery();
-
+  const [comments, setComments] = useState<{ [postId: string]: Comment[] }>({});
 
   useEffect(() => {
+    if (!postsData?.posts) return;
+
+    // Build comments object keyed by postId
+    const commentsMap: { [postId: string]: Comment[] } = {};
+
+    postsData.posts.forEach(post => {
+      commentsMap[post._id] = post.comments?.map((c: any) => ({
+        _id: c._id,
+        text: c.text,
+        author: c.author,
+        name: c.name,
+        postId: c.postId,
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt
+      })) || [];
+    });
+
+    setComments(commentsMap);
+    console.log(comments)
     if (userData) {
       const stories = userData.users.map((user: User) => convertUserToStory(user));
       setStories(stories);
     }
-  }, [userData])
+  }, [userData, postsData])
 
-  
+
   if (!session) {
     return (
       <section className="relative w-full flex-1 bg-background flex flex-col items-center justify-center">
@@ -90,9 +110,9 @@ export default function Home() {
     );
   }
 
-  if (isLoading) return <div className="text-center py-6">Loading posts...</div>;
+  if (isLoading) return <div className="text-center py-6 flex items-center justify-center flex-1">Loading posts...</div>;
   if (error) return <div className="text-center py-6">Error fetching posts</div>;
-  if (!data?.posts || data.posts.length === 0)
+  if (!postsData?.posts || postsData.posts.length === 0)
     return (
       <div className="flex flex-col items-center justify-center flex-1 py-12 text-center">
         <img src="/broken-controller.png" alt="No posts" className="w-40 mb-6 opacity-80" />
@@ -105,7 +125,7 @@ export default function Home() {
     <div className="font-sans flex flex-col bg-gradient-to-br from-primary/5 to-secondary/5 w-full items-center flex-1 p-4 pb-20 gap-4 sm:p-8">
       {stories && <StoriesBar stories={stories} />}
 
-      {data.posts.map((post: Post) => (
+      {postsData.posts.map((post: Post) => (
         <PostCard
           key={post._id}
           postId={post._id}
@@ -124,6 +144,8 @@ export default function Home() {
           likedBy={post.likes.map((l) => ({ _id: l._id, name: l.name }))}
           dislikedBy={post.dislikes.map((l) => l._id)}
           likedByImages={post.likes.slice(0, 3).map((l) => l.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${l.name}`)}
+          comments={comments[post._id] || []}
+          setComments={setComments}
         />
       ))}
     </div>
