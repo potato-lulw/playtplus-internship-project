@@ -6,7 +6,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 // NEXTAUTH_URL is automatically picked up by NextAuth but defining it is good practice.
-const NEXTAUTH_URL = process.env.NEXTAUTH_URL; 
+const NEXTAUTH_URL = process.env.NEXTAUTH_URL;
 
 
 const handler = NextAuth({
@@ -31,8 +31,8 @@ const handler = NextAuth({
           body: JSON.stringify(credentials)
         })
         const data = await res.json()
-        
-        console.log("Credentials Login Response Data:", data); 
+
+        console.log("Credentials Login Response Data:", data);
 
         if (res.ok) {
           // If login is successful, return the user object (which should contain custom data like tokens/IDs)
@@ -51,12 +51,12 @@ const handler = NextAuth({
     maxAge: 7 * 24 * 60 * 60, // 7 days
     updateAge: 24 * 60 * 60, // 24 hours
   },
-  
+
   // JWT configuration
   jwt: {
     maxAge: 7 * 24 * 60 * 60, // 7 days
   },
-  
+
   // Secret is required for signing and encrypting tokens
   secret: process.env.NEXTAUTH_SECRET,
 
@@ -76,7 +76,7 @@ const handler = NextAuth({
               name: user.name,
               email: user.email,
               avatar: user.image,
-              password: process.env.GOOGLE_PASSWORD, 
+              password: process.env.GOOGLE_PASSWORD,
             }),
           });
 
@@ -151,10 +151,22 @@ const handler = NextAuth({
       return session;
     },
   },
-  
+
   // Custom sign-in page path
   pages: {
     signIn: "/login"
+  },
+
+  cookies: {
+    sessionToken: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'none', // ⭐ Critical for cross-origin
+        path: '/',
+        secure: true, // ⭐ Required when sameSite: 'none'
+      },
+    }
   }
 })
 
