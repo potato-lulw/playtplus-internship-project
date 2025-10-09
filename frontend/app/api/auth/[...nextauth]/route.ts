@@ -2,7 +2,7 @@ import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
 
-const baseUrl = process.env.API_URL || "http://localhost:8800";
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 
 const handler = NextAuth({
