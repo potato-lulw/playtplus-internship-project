@@ -12,9 +12,19 @@ import { connectDB } from "./utils/db.js";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:3000"];
+
 app.use(cors({
-    origin: [process.env.FRONTEND_URL, 'http://localhost:3000'],
-    credentials: true
+  origin: function(origin, callback) {
+    // allow requests with no origin like Postman
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // include all
+  allowedHeaders: ["Content-Type", "Authorization"], // headers your frontend sends
+  exposedHeaders: ["Authorization"] // optional if you want frontend to read it
 }));
 app.use(cookieParser());
 
