@@ -1,7 +1,6 @@
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
-import jwt from 'jsonwebtoken'
 
 // Use NEXT_PUBLIC_API_URL for the backend URL base, as specified by the user.
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -21,22 +20,29 @@ const handler = NextAuth({
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        // 🔹 hit your backend to verify user
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`, {
+        // ✅ FIX: Using the consistently defined `baseUrl` for the backend API call.
+        const res = await fetch(`${baseUrl}/api/v1/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(credentials),
+          body: JSON.stringify(credentials)
         })
-
         const data = await res.json()
-        if (!res.ok || !data) throw new Error("Invalid credentials")
-        return data // return whatever your backend sends (must include _id)
-      },
-    }),
+
+        console.log("Credentials Login Response Data:", data);
+
+        if (res.ok) {
+          // If login is successful, return the user object (which should contain custom data like tokens/IDs)
+          return data;
+        }
+
+        // If login fails, throw an error with the message to be displayed by NextAuth's error handler
+        throw new Error(data.message || "Invalid credentials or server error");
+      }
+    })
   ],
 
   // Session configuration
@@ -60,7 +66,7 @@ const handler = NextAuth({
         httpOnly: true,
         sameSite: 'none',
         path: '/',
-        secure: true,
+        secure: true, // ⭐ Required when sameSite: 'none'
       },
     }
   },
@@ -113,12 +119,6 @@ const handler = NextAuth({
       // 1. Initial sign-in (user object exists)
       if (user) {
         // Transfer custom user data from the sign-in process to the token
-
-        const accessToken = jwt.sign(
-          { userId: user._id },
-          process.env.NEXTAUTH_SECRET,
-          { expiresIn: "7d" }
-        )
         token.user = {
           _id: user._id || "",
           name: user.name || "Unknown",
@@ -127,8 +127,7 @@ const handler = NextAuth({
           cover: user.cover || "",
           followers: user.followers || [],
           following: user.following || [],
-        };        
-        token.accessToken = accessToken
+        };
       }
 
       // 2. Client calls update() (trigger is "update")
@@ -158,7 +157,6 @@ const handler = NextAuth({
           followers: any[];
           following: any[];
         };
-        session.accessToken = token.accessToken;
       }
 
       return session;
